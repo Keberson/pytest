@@ -133,8 +133,21 @@ class TestPet:
     def test_get_find_by_status(self):
         pass
 
-    def test_get_id(self):
-        pass
+    def test_get_id_correct(self, pets):
+        for pet in pets:
+            response = requests.get(f'{ENDPOINT}/{pet.id}')
+            assert response.status_code == 200
+
+            got_pet = Pet(**json.loads(response.content))
+            assert pet == got_pet
+
+    @pytest.mark.parametrize(
+        'payload',
+        ['0', '-1', 'abd']
+    )
+    def test_get_id_incorrect(self, payload):
+        response = requests.get(f'{ENDPOINT}/{payload}')
+        assert response.status_code == 404
 
     def test_post_id_correct(self, pets):
         for pet in pets:
@@ -149,7 +162,11 @@ class TestPet:
 
             pets.remove(pet)
 
-    def test_delete_id_incorrect(self):
-        response = requests.delete(f'{ENDPOINT}/0')
+    @pytest.mark.parametrize(
+        'payload',
+        ['0', '-1', 'abd']
+    )
+    def test_delete_id_incorrect(self, payload):
+        response = requests.delete(f'{ENDPOINT}/{payload}')
 
         assert response.status_code == 404
