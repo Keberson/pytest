@@ -130,16 +130,32 @@ class TestPet:
     def test_put(self):
         pass
 
-    def test_get_find_by_status(self):
-        pass
+    @pytest.mark.parametrize(
+        'status',
+        list(StatusEnum)
+    )
+    def test_get_find_by_status_correct(self, status):
+        params = {'status': status}
+        response = requests.get(f'{ENDPOINT}/findByStatus', params=params)
+
+        assert response.status_code == 200
+
+        for pet in response.json():
+            try:
+                Pet(**pet)
+            except ValidationError:
+                assert False
 
     def test_get_id_correct(self, pets):
         for pet in pets:
             response = requests.get(f'{ENDPOINT}/{pet.id}')
             assert response.status_code == 200
 
-            got_pet = Pet(**json.loads(response.content))
-            assert pet == got_pet
+            try:
+                got_pet = Pet(**json.loads(response.content))
+                assert pet == got_pet
+            except ValidationError:
+                assert False
 
     @pytest.mark.parametrize(
         'payload',
