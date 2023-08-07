@@ -1,5 +1,3 @@
-from abc import ABC
-
 import pytest
 from typing import List, Optional
 from pydantic import BaseModel, ValidationError
@@ -7,15 +5,7 @@ from enum import StrEnum, auto
 import requests
 import json
 
-ENDPOINT = 'https://petstore.swagger.io/v2'
-
-
-@pytest.fixture()
-def headers():
-    return {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
+ENDPOINT = 'https://petstore.swagger.io/v2/pet'
 
 
 class StatusEnum(StrEnum):
@@ -75,6 +65,18 @@ class PetEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+@pytest.fixture()
+def headers():
+    return {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+
+@pytest.fixture(scope="session")
+def pets():
+    return []
+
+
 class TestPet:
     @pytest.mark.parametrize(
         'payload',
@@ -93,12 +95,12 @@ class TestPet:
         ]
     )
     @pytest.mark.create
-    def test_post_correct(self, headers, payload):
+    def test_post_correct(self, headers, pets, payload):
         pet = Pet(**payload)
         serialized = json.dumps(pet, cls=PetEncoder)
 
         response = requests.post(
-            f'{ENDPOINT}/pet',
+            ENDPOINT,
             data=serialized,
             headers=headers
         )
@@ -108,13 +110,15 @@ class TestPet:
         try:
             got_pet = Pet(**json.loads(response.content))
             assert pet == got_pet
-        except ValueError:
-            pytest.raises(ValueError)
+
+            pets.append(got_pet)
+        except ValidationError:
+            assert False
 
     @pytest.mark.create
     def test_post_incorrect(self, headers):
         response = requests.post(
-            f'{ENDPOINT}/pet',
+            ENDPOINT,
             data={},
             headers=headers
         )
@@ -134,5 +138,13 @@ class TestPet:
     def test_post_id(self):
         pass
 
-    def test_delete_id(self):
-        pass
+    def test_delete_id_correct(self, pets):
+        for pet in pets:
+            response = requests.delete(f'{ENDPOINT}/{pet.id}')
+
+            assert response.status_code == 200
+
+    def test_delete_id_incorrect(self):
+        response = requests.delete(f'{ENDPOINT}/0')
+
+        assert response.status_code == 404
