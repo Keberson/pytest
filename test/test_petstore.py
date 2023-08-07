@@ -72,6 +72,7 @@ def headers():
         'Accept': 'application/json'
     }
 
+
 @pytest.fixture(scope="session")
 def pets():
     return []
@@ -135,14 +136,18 @@ class TestPet:
     def test_get_id(self):
         pass
 
-    def test_post_id(self):
-        pass
+    def test_post_id_correct(self, pets):
+        for pet in pets:
+            params = {'name': 'Vasya', 'status': 'sold'}
+            response = requests.post(f'{ENDPOINT}/{pet.id}', params=params)
+            assert response.status_code == 200
 
     def test_delete_id_correct(self, pets):
         for pet in pets:
             response = requests.delete(f'{ENDPOINT}/{pet.id}')
-
             assert response.status_code == 200
+
+            pets.remove(pet)
 
     def test_delete_id_incorrect(self):
         response = requests.delete(f'{ENDPOINT}/0')
