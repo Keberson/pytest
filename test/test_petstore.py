@@ -7,6 +7,68 @@ import json
 
 ENDPOINT = 'https://petstore.swagger.io/v2/pet'
 
+BASE_PAYLOAD = [
+    {
+        "id": 9223372036854262000,
+        "category": {
+            "id": 0,
+            "name": "string"
+        },
+        "name": "fish",
+        "photoUrls": [
+            "string"
+        ],
+        "tags": [
+            {
+                "id": 0,
+                "name": "string"
+            }
+        ],
+        "status": "available"
+    },
+    {
+        "id": 1020410,
+        "category": {
+            "id": 1,
+            "name": "Perro"
+        },
+        "name": "Cristian",
+        "photoUrls": [
+            "urlFoto",
+            "urlFoto2"
+        ],
+        "tags": [
+            {
+                "id": 1,
+                "name": "Tag1"
+            },
+            {
+                "id": 2,
+                "name": "Tag2"
+            }
+        ],
+        "status": "pending"
+    },
+    {
+        "id": 9,
+        "category": {
+            "id": 0,
+            "name": "cats"
+        },
+        "name": "King Kong",
+        "photoUrls": [
+            "string"
+        ],
+        "tags": [
+            {
+                "id": 0,
+                "name": "string"
+            }
+        ],
+        "status": "sold"
+    },
+]
+
 
 class StatusEnum(StrEnum):
     available = auto()
@@ -75,7 +137,7 @@ def headers():
 
 @pytest.fixture(scope="session")
 def pets():
-    return []
+    return [Pet(**data) for data in BASE_PAYLOAD]
 
 
 class TestPet:
@@ -149,13 +211,13 @@ class TestPet:
         'payload',
         [
             {
-                 'id': "0",
-                 'name': "new doggie",
-                 'photoUrls': ["url"],
-                 'category': {'id': 0, 'name': "string"},
-                 'tags': [{'id': 0, "name": "string"}],
-                 'status': "available"
-             },
+                'id': "0",
+                'name': "new doggie",
+                'photoUrls': ["url"],
+                'category': {'id': 0, 'name': "string"},
+                'tags': [{'id': 0, "name": "string"}],
+                'status': "available"
+            },
         ]
     )
     @pytest.mark.edit
