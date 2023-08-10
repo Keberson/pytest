@@ -2,3 +2,5 @@ pytest
 accessify
 pydantic
 requests
+psycopg2
+allure-pytest
