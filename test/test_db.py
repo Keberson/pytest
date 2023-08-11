@@ -128,7 +128,7 @@ def clear_db(db, users) -> None:
             db.delete_user(user['id'])
 
 
-@allure.feature('Тестирование базы данных')
+@allure.feature('Тестирование базы данных postgres data base "Booking website database"')
 class TestDB:
     @allure.story('Тестирование создания пользователя')
     def test_create_user(self, db, users):
