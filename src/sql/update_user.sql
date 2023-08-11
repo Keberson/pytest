@@ -1,4 +1,4 @@
 UPDATE users
 SET
-    '$to_update'
+    $to_update
 WHERE id='$id'

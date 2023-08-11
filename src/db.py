@@ -25,12 +25,14 @@ def db_error_wrap(func):
     :param func: функция, которую нужно "обернуть"
     :return: функция, "обернутая" обработкой ошибок
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except OperationalError as error:
             print(f'Ошибка при работе с БД: {error}')
+            raise OperationalError
 
     return wrapper
 
@@ -62,18 +64,23 @@ class DB:
         sql = self._sql.get('create_user.sql', **data)
         cursor = self._connection.cursor()
         cursor.execute(sql)
+        cursor.close()
+
+        return cursor.rowcount
 
     @db_error_wrap
     def get_info_user(self, id_user: int):
         """
         Метод для получения информации о пользователе
         :param id_user: id пользователя, о котором нужно получить информацию
+        :return: результат запроса в БД (список или None)
         """
         sql = self._sql.get('get_info_user.sql', id=id_user)
         cursor = self._connection.cursor()
         cursor.execute(sql)
+        response = cursor.fetchone()
 
-        return cursor.description
+        return {cursor.description[i].name: response[i] for i in range(len(response))} if response is not None else None
 
     @db_error_wrap
     def update_user(self, id_user: int, new_data: dict):
@@ -82,10 +89,14 @@ class DB:
         :param id_user: id пользователя, о котором нужно получить информацию
         :param new_data: словарь с данными пользователя, которые нужно обновить
         """
-        to_update = ','.join([f'{key}={new_data[key]}' if key != 'id' else None for key in new_data])
+        copy_data = new_data
+        copy_data.pop('id', None)
+        to_update = ','.join([f'{key}=\'{copy_data[key]}\'' for key in copy_data])
         sql = self._sql.get('update_user.sql', id=id_user, to_update=to_update)
         cursor = self._connection.cursor()
         cursor.execute(sql)
+
+        return cursor.rowcount
 
     @db_error_wrap
     def delete_user(self, id_user: int):
@@ -96,3 +107,5 @@ class DB:
         sql = self._sql.get('delete_user.sql', id=id_user)
         cursor = self._connection.cursor()
         cursor.execute(sql)
+
+        return cursor.rowcount
