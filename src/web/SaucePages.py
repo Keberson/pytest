@@ -53,3 +53,12 @@ class LoginHelper(BasePage):
         """
         self.find_element(CatalogLocators.LOCATOR_BURGER_BTN).click()
         self.find_element(CatalogLocators.LOCATOR_LOGOUT).click()
+
+
+class CatalogHelper(BasePage):
+    def product_add_to_cart(self, locator):
+        """
+        Добавление в корзину товара по локатору его кнопки
+        :param locator: локатор элемента
+        """
+        self.find_element(locator).click()

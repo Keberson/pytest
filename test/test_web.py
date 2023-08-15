@@ -3,7 +3,7 @@ import time
 import pytest
 from selenium import webdriver
 
-from src.web.SaucePages import LoginHelper, LoginLocators, CatalogLocators
+from src.web.SaucePages import LoginHelper, CatalogHelper, LoginLocators, CatalogLocators
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -36,8 +36,19 @@ class TestWeb:
         assert login_page.check_element(LoginLocators.LOCATOR_CONTAINER)
         assert login_page.check_element(LoginLocators.LOCATOR_ERROR)
 
-    def test_product(self):
-        pass
+    @pytest.mark.parametrize(
+        'payload',
+        [
+            'add-to-cart-sauce-labs-backpack',
+            'add-to-cart-sauce-labs-bike-light',
+            'add-to-cart-sauce-labs-fleece-jacket',
+            'add-to-cart-sauce-labs-bolt-t-shirt',
+            'add-to-cart-sauce-labs-onesie',
+            'add-to-cart-test.allthethings()-t-shirt-(red)'
+        ]
+    )
+    def test_product(self, payload, browser):
+        catalog_page = CatalogHelper(browser)
 
     def test_basket(self):
         pass
