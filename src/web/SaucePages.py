@@ -1,25 +1,5 @@
 from src.web.BaseApp import BasePage
-from selenium.webdriver.common.by import By
-
-
-class LoginLocators:
-    """
-     Класс для хранения необходимых локаторов страницы Авторизации
-     """
-    LOCATOR_CONTAINER = (By.CLASS_NAME, "login_container")
-    LOCATOR_USERNAME = (By.ID, "user-name")
-    LOCATOR_PASSWORD = (By.ID, "password")
-    LOCATOR_SUBMIT = (By.ID, "login-button")
-    LOCATOR_ERROR = (By.CLASS_NAME, "error")
-
-
-class CatalogLocators:
-    """
-    Класс для хранения необходимых локаторов страницы Каталога
-    """
-    LOCATOR_CONTAINER = (By.CLASS_NAME, "page_wrapper")
-    LOCATOR_BURGER_BTN = (By.ID, "react-burger-menu-btn")
-    LOCATOR_LOGOUT = (By.LINK_TEXT, "Logout")
+from src.web.Locators import *
 
 
 class LoginHelper(BasePage):
@@ -31,21 +11,17 @@ class LoginHelper(BasePage):
         """
         Метод для аутентификация под стандартным пользователем
         """
-        self.enter_text(LoginLocators.LOCATOR_USERNAME,
-                        self.LOGIN_STANDARD)
-        self.enter_text(LoginLocators.LOCATOR_PASSWORD,
-                        self.PASSWORD)
-        self.click_on_the_button(LoginLocators.LOCATOR_SUBMIT)
+        self.enter_text(LoginLocators.LOCATOR_USERNAME, self.LOGIN_STANDARD)
+        self.enter_text(LoginLocators.LOCATOR_PASSWORD, self.PASSWORD)
+        self.click_on_the(LoginLocators.LOCATOR_SUBMIT)
 
     def auth_locked(self) -> None:
         """
         Метод для аутентификации под заблокированным пользователем
         """
-        self.enter_text(LoginLocators.LOCATOR_USERNAME,
-                        self.LOGIN_LOCKED)
-        self.enter_text(LoginLocators.LOCATOR_PASSWORD,
-                        self.PASSWORD)
-        self.click_on_the_button(LoginLocators.LOCATOR_SUBMIT)
+        self.enter_text(LoginLocators.LOCATOR_USERNAME, self.LOGIN_LOCKED)
+        self.enter_text(LoginLocators.LOCATOR_PASSWORD, self.PASSWORD)
+        self.click_on_the(LoginLocators.LOCATOR_SUBMIT)
 
     def logout(self) -> None:
         """
@@ -55,10 +31,43 @@ class LoginHelper(BasePage):
         self.find_element(CatalogLocators.LOCATOR_LOGOUT).click()
 
 
-class CatalogHelper(BasePage):
+class ProductHelper(LoginHelper):
+    FIRST_NAME = 'Maksim'
+    LAST_NAME = 'Kuzov'
+    ZIP = '127015'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.auth_standard()
+
     def product_add_to_cart(self, locator):
         """
-        Добавление в корзину товара по локатору его кнопки
+        Метод для добавление в корзину товара по локатору его кнопки
         :param locator: локатор элемента
         """
         self.find_element(locator).click()
+
+    def get_cart_counter(self) -> int:
+        """
+        Метод для получения счетчика у корзины
+        :return: количество товаров в корзине
+        """
+        badge = 0
+
+        try:
+            element = self.find_element(CatalogLocators.LOCATOR_CART_BADGE, time=2)
+            badge = int(element.text)
+        except TimeoutError:
+            badge = -1
+
+        return badge
+
+    def fill_information(self):
+        """
+        Метод для заполнения полей с информации при оформлении заказа
+        """
+        self.enter_text(PurchaseLocators.LOCATOR_FIRST_NAME, self.FIRST_NAME)
+        self.enter_text(PurchaseLocators.LOCATOR_LAST_NAME, self.LAST_NAME)
+        self.enter_text(PurchaseLocators.LOCATOR_ZIP, self.ZIP)
+        self.click_on_the(PurchaseLocators.LOCATOR_CONTINUE)
+

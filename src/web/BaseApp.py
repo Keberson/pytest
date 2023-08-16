@@ -12,8 +12,9 @@ class BasePage:
     def __init__(self, driver: Chrome):
         self.driver: Chrome = driver
         self.base_url = "https://www.saucedemo.com/"
+        self.go_to_url()
 
-    def go_to(self, url=''):
+    def go_to_url(self, url=''):
         """
         Переход по начальному URL
         """
@@ -54,7 +55,7 @@ class BasePage:
 
         return field
 
-    def click_on_the_button(self, locator):
+    def click_on_the(self, locator):
         """
         Метод для нажатия на элемент по локатору
         :param locator: локатор элемента

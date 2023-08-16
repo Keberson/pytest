@@ -1,9 +1,8 @@
-import time
-
 import pytest
 from selenium import webdriver
 
-from src.web.SaucePages import LoginHelper, CatalogHelper, LoginLocators, CatalogLocators
+from src.web.Locators import *
+from src.web.SaucePages import LoginHelper, ProductHelper
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -16,13 +15,17 @@ def browser():
     driver.close()
 
 
+@pytest.fixture()
+def logged_product(browser):
+    product_page = ProductHelper(browser)
+    yield product_page
+
 class TestWeb:
     def test_login(self, browser):
         login_page = LoginHelper(browser)
-        login_page.go_to()
         login_page.auth_standard()
 
-        assert login_page.check_element(CatalogLocators.LOCATOR_CONTAINER)
+        assert login_page.check_element(CatalogLocators.LOCATOR_BURGER_BTN)
 
         login_page.logout()
 
@@ -30,14 +33,13 @@ class TestWeb:
 
     def test_locked(self, browser):
         login_page = LoginHelper(browser)
-        login_page.go_to()
         login_page.auth_locked()
 
         assert login_page.check_element(LoginLocators.LOCATOR_CONTAINER)
         assert login_page.check_element(LoginLocators.LOCATOR_ERROR)
 
     @pytest.mark.parametrize(
-        'payload',
+        'add_button_class_name',
         [
             'add-to-cart-sauce-labs-backpack',
             'add-to-cart-sauce-labs-bike-light',
@@ -47,8 +49,33 @@ class TestWeb:
             'add-to-cart-test.allthethings()-t-shirt-(red)'
         ]
     )
-    def test_product(self, payload, browser):
-        catalog_page = CatalogHelper(browser)
+    def test_purchase(self, add_button_class_name, logged_product):
+        logged_product.click_on_the((By.ID, add_button_class_name))
+
+        assert logged_product.get_cart_counter() == 1
+
+        logged_product.click_on_the(CatalogLocators.LOCATOR_CART)
+
+        assert logged_product.check_element(CartLocators.LOCATOR_LIST)
+        assert logged_product.check_element(CartLocators.LOCATOR_CHECKOUT)
+
+        logged_product.click_on_the(CartLocators.LOCATOR_CHECKOUT)
+
+        assert logged_product.check_element(PurchaseLocators.LOCATOR_CONTAINER)
+        assert logged_product.check_element(PurchaseLocators.LOCATOR_CONTINUE)
+
+        logged_product.fill_information()
+
+        assert logged_product.check_element(PurchaseLocators.LOCATOR_FINISH)
+
+        logged_product.click_on_the(PurchaseLocators.LOCATOR_FINISH)
+
+        assert logged_product.check_element(CompleteLocators.LOCATOR_COMPLETE)
+        assert logged_product.check_element(CompleteLocators.LOCATOR_BACK)
+
+        logged_product.click_on_the(CompleteLocators.LOCATOR_BACK)
+
+        assert logged_product.check_element(CatalogLocators.LOCATOR_CONTAINER)
 
     def test_basket(self):
         pass
