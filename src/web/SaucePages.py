@@ -1,3 +1,4 @@
+from selenium.common import TimeoutException
 from src.web.BaseApp import BasePage
 from src.web.Locators import *
 
@@ -52,13 +53,11 @@ class ProductHelper(LoginHelper):
         Метод для получения счетчика у корзины
         :return: количество товаров в корзине
         """
-        badge = 0
-
         try:
             element = self.find_element(CatalogLocators.LOCATOR_CART_BADGE, time=2)
             badge = int(element.text)
-        except TimeoutError:
-            badge = -1
+        except TimeoutException:
+            badge = 0
 
         return badge
 

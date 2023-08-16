@@ -28,6 +28,7 @@ class CartLocators:
     Класс для хранения локаторов страницы Корзина
     """
     LOCATOR_LIST = (By.CLASS_NAME, "cart_list")
+    LOCATOR_ITEM_NAME = (By.CLASS_NAME, "inventory_item_name")
     LOCATOR_CHECKOUT = (By.ID, "checkout")
 
 
