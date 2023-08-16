@@ -17,8 +17,13 @@ def browser():
 
 @pytest.fixture()
 def logged_product(browser):
+    """
+    Фикстура с залогининым пользователем
+    :param browser: фикстура драйвера
+    """
     product_page = ProductHelper(browser)
     yield product_page
+
 
 class TestWeb:
     def test_login(self, browser):
@@ -50,6 +55,7 @@ class TestWeb:
         ]
     )
     def test_purchase(self, add_button_class_name, logged_product):
+        logged_product.go_to_url("https://www.saucedemo.com/inventory.html")
         logged_product.click_on_the((By.ID, add_button_class_name))
 
         assert logged_product.get_cart_counter() == 1
