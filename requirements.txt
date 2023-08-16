@@ -5,4 +5,3 @@ requests
 psycopg2
 allure-pytest
 selenium
-pytest-github-report
