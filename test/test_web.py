@@ -1,5 +1,6 @@
 import pytest
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 
 from src.web.Locators import *
 from src.web.SaucePages import LoginHelper, ProductHelper
@@ -25,6 +26,7 @@ def logged_product(browser):
     product_page = ProductHelper(browser)
     yield product_page
 
+
 @pytest.fixture(scope="function")
 def clear_logged(logged_product):
     """
@@ -34,6 +36,7 @@ def clear_logged(logged_product):
     logged_product.driver.execute_script('window.localStorage.clear();')
     logged_product.go_to_url("https://www.saucedemo.com/inventory.html")
     yield logged_product
+
 
 class TestWeb:
     def test_login(self, browser):
@@ -107,5 +110,30 @@ class TestWeb:
 
         assert clear_logged.get_cart_counter() == 0
 
-    def test_sort(self):
-        pass
+    @pytest.mark.parametrize(
+        'sort_type, reverse',
+        [
+            ('Name (A to Z)', False),
+            ('Name (Z to A)', True),
+            ('Price (low to high)', False),
+            ('Price (high to low)', True),
+        ]
+    )
+    def test_sort(self, clear_logged, sort_type, reverse):
+        select = Select(clear_logged.find_element(CatalogLocators.LOCATOR_SELECT))
+        select.select_by_visible_text(sort_type)
+
+        assert clear_logged.find_element(CatalogLocators.LOCATOR_ACTIVE_SELECT).text == sort_type
+
+        all_items = clear_logged.find_elements(CatalogLocators.LOCATOR_ITEM)
+        sorted_items = []
+        prototype = []
+
+        if 'Name' in sort_type:
+            sorted_items = [item.text.split('\n')[0] for item in all_items]
+            prototype = sorted(Product.PRODUCTS_NAME, reverse=reverse)
+        elif 'Price' in sort_type:
+            sorted_items = [float(item.text.split('\n')[2].removeprefix('$')) for item in all_items]
+            prototype = sorted(Product.PRODUCTS_PRICE, reverse=reverse)
+
+        assert sorted_items == prototype

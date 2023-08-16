@@ -14,6 +14,15 @@ class Product:
         'Test.allTheThings() T-Shirt (Red)',
     ]
 
+    PRODUCTS_PRICE = [
+        29.99,
+        9.99,
+        49.99,
+        15.99,
+        7.99,
+        15.99,
+    ]
+
     PRODUCTS_ADD = [
         'add-to-cart-sauce-labs-backpack',
         'add-to-cart-sauce-labs-bike-light',
@@ -41,17 +50,6 @@ class Product:
         :return: список локаторов
         """
         return [(locator_type, item) for item in to_convert]
-
-    @staticmethod
-    def get_full_list():
-        """
-        Метод для получения списка кортежей каждого товара вида: (Имя, локатор кнопки добавления, локатор кнопки
-        удаления)
-        :return: список кортежей
-        """
-        return list(zip(Product.PRODUCTS_NAME,
-                        Product.get_locator_list(Product.PRODUCTS_ADD, By.ID),
-                        Product.get_locator_list(Product.PRODUCTS_REMOVE, By.ID)))
 
     @staticmethod
     def get_name_add():

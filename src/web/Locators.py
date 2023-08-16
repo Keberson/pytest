@@ -21,6 +21,9 @@ class CatalogLocators:
     LOCATOR_LOGOUT = (By.LINK_TEXT, "Logout")
     LOCATOR_CART_BADGE = (By.CLASS_NAME, "shopping_cart_badge")
     LOCATOR_CART = (By.CLASS_NAME, "shopping_cart_link")
+    LOCATOR_SELECT = (By.CLASS_NAME, "product_sort_container")
+    LOCATOR_ACTIVE_SELECT = (By.CLASS_NAME, "active_option")
+    LOCATOR_ITEM = (By.CLASS_NAME, "inventory_item")
 
 
 class CartLocators:
