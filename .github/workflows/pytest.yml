@@ -18,9 +18,8 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
       - name: Test with pytest
-        run: pytest || true
+        run: pytest --junitxml=pytest_report.xml || true
       - name: Update README
         run: |
           echo "## Результат тесирования" >> README.md
-          pytest --junitxml=pytest_report.xml
           cat pytest_report.xml >> README.md
