@@ -18,15 +18,4 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
       - name: Test with pytest
-        run: pytest --junitxml=pytest_report.xml || true
-      - name: Update README
-        run: |
-          echo "## Результат тесирования" >> README.md
-          cat pytest_report.xml
-          cat pytest_report.xml >> README.md
-          git diff
-          git config --global user.email "readme-bot@kebersongithub.com"
-          git config --global user.name "README-bot"
-          git add -A
-          git commit -m "Обновление README после тестирования" || exit 0
-          git push
+        run: pytest || true
